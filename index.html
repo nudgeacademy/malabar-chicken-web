@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Malabar Chicken ERP</title>
+    <!-- Google Fonts & Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <div id="app-container">
+        
+        <!-- 1. SPLASH SCREEN -->
+        <section id="splash-screen" class="screen-view active">
+            <div class="splash-content">
+                <div class="splash-logo-container">
+                    <span class="material-icons-round splash-logo-icon">storefront</span>
+                </div>
+                <h1 class="splash-title">MALABAR CHICKEN</h1>
+                <p class="splash-subtitle">ERP MANAGEMENT SYSTEM</p>
+                <div class="splash-loader">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. LOGIN SCREEN -->
+        <section id="login-screen" class="screen-view">
+            <div class="login-container">
+                <div class="login-logo-card">
+                    <img src="assets/logo.png" alt="App Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
+                </div>
+                <h2 class="login-title">Malabar Chicken ERP</h2>
+                <p class="login-subtitle">Secure ERP Console Login</p>
+                
+                <div class="login-card">
+                    <form id="login-form">
+                        <div class="input-group">
+                            <label for="login-username">Username</label>
+                            <div class="input-wrapper">
+                                <span class="material-icons-round input-icon">person</span>
+                                <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="login-password">Password</label>
+                            <div class="input-wrapper">
+                                <span class="material-icons-round input-icon">lock</span>
+                                <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-login" class="btn btn-primary btn-block">
+                            <span class="btn-text">Log In</span>
+                            <div class="btn-loader hidden">
+                                <div class="spinner spinner-white"></div>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="demo-info-card">
+                    <span class="material-icons-round info-icon">info</span>
+                    <p>Demo access credentials:<br>Use <strong>admin/password</strong> or <strong>staff/password</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. MAIN DASHBOARD SCREEN -->
+        <section id="main-screen" class="screen-view">
+            <header class="app-bar">
+                <div class="app-bar-title-wrapper">
+                    <h2 class="app-bar-title">Malabar Chicken ERP</h2>
+                    <span id="user-role-badge" class="user-role-label">Logged in as ...</span>
+                </div>
+                <div class="app-bar-actions">
+                    <button id="btn-logout" class="btn-icon" title="Logout">
+                        <span class="material-icons-round">exit_to_app</span>
+                    </button>
+                </div>
+            </header>
+            
+            <main class="screen-content">
+                <!-- Date Selector Row -->
+                <div class="card date-selector-card">
+                    <button id="dashboard-date-prev" class="btn-icon-small">
+                        <span class="material-icons-round">keyboard_arrow_left</span>
+                    </button>
+                    <div id="dashboard-date-display" class="date-picker-trigger">
+                        <span class="material-icons-round">date_range</span>
+                        <span id="selected-date-text">Select Date</span>
+                        <input type="date" id="dashboard-date-picker" class="hidden-date-input">
+                    </div>
+                    <div class="date-selector-right">
+                        <button id="dashboard-date-today" class="btn-text-small hidden">Today</button>
+                        <button id="dashboard-date-next" class="btn-icon-small">
+                            <span class="material-icons-round">keyboard_arrow_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Dashboard Performance Elements -->
+                <div id="admin-dashboard-widgets" class="admin-only hidden">
+                    <!-- Daily P&L Hero Card -->
+                    <div id="pnl-hero-card" class="pnl-hero card profit">
+                        <div class="pnl-header">
+                            <span class="pnl-title">Daily Performance</span>
+                            <span id="pnl-date" class="pnl-date-text">...</span>
+                        </div>
+                        <div id="pnl-amount" class="pnl-value">₹0.00</div>
+                        <div id="pnl-status" class="pnl-status-label">Net Profit ↑</div>
+                        <div class="pnl-divider"></div>
+                        <div class="pnl-stats-row">
+                            <div class="pnl-stat-item">
+                                <span class="stat-label">Sales</span>
+                                <span id="stat-sales-amount" class="stat-value income">₹0</span>
+                                <span id="stat-sales-count" class="stat-count">0 bills</span>
+                            </div>
+                            <div class="pnl-stat-item">
+                                <span class="stat-label">Purchases</span>
+                                <span id="stat-purchases-amount" class="stat-value expense">₹0</span>
+                                <span id="stat-purchases-count" class="stat-count">0 lots</span>
+                            </div>
+                            <div class="pnl-stat-item">
+                                <span class="stat-label">Expenses</span>
+                                <span id="stat-expenses-amount" class="stat-value text-white">₹0</span>
+                                <span id="stat-expenses-count" class="stat-count">0 items</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ledger Cards -->
+                    <div class="ledger-cards-grid">
+                        <div class="card ledger-card owe-farmers">
+                            <span class="ledger-label">We Owe Farmers</span>
+                            <span id="ledger-owe-farmers-value" class="ledger-value">₹0.00</span>
+                            <span id="ledger-owe-farmers-sub" class="ledger-sub">0 farmers</span>
+                        </div>
+                        <div class="card ledger-card shops-owe">
+                            <span class="ledger-label">Shops Owe Us</span>
+                            <span id="ledger-shops-owe-value" class="ledger-value">₹0.00</span>
+                            <span id="ledger-shops-owe-sub" class="ledger-sub">0 shops</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modules Grid Section -->
+                <div class="section-header">
+                    <h3>ERP Modules</h3>
+                </div>
+                <div id="modules-grid" class="modules-grid">
+                    <!-- Dynamically populated based on user permissions -->
+                </div>
+            </main>
+        </section>
+
+        <!-- 4. FARMERS SCREEN -->
+        <section id="farmers-screen" class="screen-view">
+            <header class="app-bar">
+                <button class="btn-icon btn-back">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 class="app-bar-title">Farmers</h2>
+                <div class="app-bar-actions"></div>
+            </header>
+            <div id="farmers-summary-bar" class="summary-bar hidden">
+                <span id="farmers-count-label">0 Farmers registered</span>
+                <span id="farmers-total-payable" class="total-payable-label">Total Payable: ₹0.00</span>
+            </div>
+            <main class="screen-content scrollable">
+                <div id="farmers-list" class="list-container">
+                    <!-- Farmers cards will be loaded here -->
+                </div>
+            </main>
+            <button id="fab-add-farmer" class="fab" title="Add Farmer">
+                <span class="material-icons-round">add</span>
+                <span class="fab-text">Add Farmer</span>
+            </button>
+        </section>
+
+        <!-- 5. SHOPS SCREEN -->
+        <section id="shops-screen" class="screen-view">
+            <header class="app-bar">
+                <button class="btn-icon btn-back">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 class="app-bar-title">Chicken Shops</h2>
+                <div class="app-bar-actions"></div>
+            </header>
+            <div id="shops-summary-bar" class="summary-bar hidden">
+                <span id="shops-count-label">0 Shops registered</span>
+                <span id="shops-total-receivable" class="total-receivable-label">Total Receivable: ₹0.00</span>
+            </div>
+            <main class="screen-content scrollable">
+                <div id="shops-list" class="list-container">
+                    <!-- Shops cards here -->
+                </div>
+            </main>
+            <button id="fab-add-shop" class="fab" title="Add Shop">
+                <span class="material-icons-round">add</span>
+                <span class="fab-text">Add Shop</span>
+            </button>
+        </section>
+
+        <!-- 6. PURCHASES SCREEN -->
+        <section id="purchases-screen" class="screen-view">
+            <header class="app-bar">
+                <button class="btn-icon btn-back">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 class="app-bar-title">Farmers Purchases Log</h2>
+                <div class="app-bar-actions"></div>
+            </header>
+            <main class="screen-content scrollable">
+                <div id="purchases-list" class="list-container">
+                    <!-- Purchases grouped by date -->
+                </div>
+            </main>
+            <button id="fab-add-purchase" class="fab" title="Log Purchase">
+                <span class="material-icons-round">add</span>
+            </button>
+        </section>
+
+        <!-- 7. SALES SCREEN -->
+        <section id="sales-screen" class="screen-view">
+            <header class="app-bar">
+                <button class="btn-icon btn-back">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 class="app-bar-title">Shops Sales Log</h2>
+                <div class="app-bar-actions"></div>
+            </header>
+            <main class="screen-content scrollable">
+                <div id="sales-list" class="list-container">
+                    <!-- Sales grouped by date -->
+                </div>
+            </main>
+            <button id="fab-add-sale" class="fab" title="Log Sale">
+                <span class="material-icons-round">add</span>
+            </button>
+        </section>
+
+        <!-- 8. EXPENSES SCREEN -->
+        <section id="expenses-screen" class="screen-view">
+            <header class="app-bar">
+                <button class="btn-icon btn-back">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 class="app-bar-title">Operating Expenses</h2>
+                <div class="app-bar-actions"></div>
+            </header>
+            <div class="tabs-container">
+                <button id="tab-expenses-today" class="tab-btn active">Today</button>
+                <button id="tab-expenses-all" class="tab-btn">All Time</button>
+            </div>
+            <div id="expenses-summary-bar" class="summary-bar">
+                <span id="expenses-total-label">Total Expenses: ₹0.00</span>
+            </div>
+            <main class="screen-content scrollable">
+                <div id="expenses-list" class="list-container">
+                    <!-- Expenses list -->
+                </div>
+            </main>
+            <button id="fab-add-expense" class="fab" title="Add Expense">
+                <span class="material-icons-round">add</span>
+            </button>
+        </section>
+
+        <!-- 9. PAYMENTS SCREEN -->
+        <section id="payments-screen" class="screen-view">
+            <header class="app-bar">
+                <button class="btn-icon btn-back">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 class="app-bar-title">Payments</h2>
+                <div class="app-bar-actions"></div>
+            </header>
+            <div class="tabs-container">
+                <button id="tab-payments-all" class="tab-btn active">All</button>
+                <button id="tab-payments-farmers" class="tab-btn">Farmers</button>
+                <button id="tab-payments-shops" class="tab-btn">Shops</button>
+            </div>
+            <main class="screen-content scrollable">
+                <div id="payments-list" class="list-container">
+                    <!-- Payments list -->
+                </div>
+            </main>
+            <button id="fab-add-payment" class="fab" title="Add Payment">
+                <span class="material-icons-round">add</span>
+            </button>
+        </section>
+
+        <!-- 10. VEHICLES SCREEN -->
+        <section id="vehicles-screen" class="screen-view">
+            <header class="app-bar">
+                <button class="btn-icon btn-back">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 class="app-bar-title">Manage Vehicles</h2>
+                <div class="app-bar-actions"></div>
+            </header>
+            <main class="screen-content scrollable">
+                <div id="vehicles-list" class="list-container">
+                    <!-- Vehicles cards -->
+                </div>
+            </main>
+            <button id="fab-add-vehicle" class="fab" title="Add Vehicle">
+                <span class="material-icons-round">add</span>
+            </button>
+        </section>
+
+        <!-- 11. STAFF MANAGEMENT SCREEN -->
+        <section id="manage-staff-screen" class="screen-view">
+            <header class="app-bar">
+                <button class="btn-icon btn-back">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 class="app-bar-title">Manage Staff</h2>
+                <div class="app-bar-actions"></div>
+            </header>
+            <main class="screen-content scrollable">
+                <div id="staff-list" class="list-container">
+                    <!-- Staff list -->
+                </div>
+            </main>
+            <button id="fab-add-staff" class="fab" title="Add Staff">
+                <span class="material-icons-round">add</span>
+            </button>
+        </section>
+
+        <!-- 12. REPORTS SCREEN -->
+        <section id="reports-screen" class="screen-view">
+            <header class="app-bar">
+                <button class="btn-icon btn-back">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 class="app-bar-title">Financial Reports</h2>
+                <div class="app-bar-actions">
+                    <button id="btn-report-export-pdf" class="btn-icon" title="Export PDF">
+                        <span class="material-icons-round">picture_as_pdf</span>
+                    </button>
+                </div>
+            </header>
+            <div class="tabs-container">
+                <button id="tab-report-pnl" class="tab-btn active">P&L Summary</button>
+                <button id="tab-report-farmers" class="tab-btn">Farmers Ledger</button>
+                <button id="tab-report-shops" class="tab-btn">Shops Ledger</button>
+                <button id="tab-report-vehicles" class="tab-btn">Vehicle Logs</button>
+            </div>
+            <main class="screen-content scrollable">
+                <!-- Tab contents populated via JS -->
+                <div id="report-tab-content"></div>
+            </main>
+        </section>
+
+        <!-- 13. PRINT / LEDGER PREVIEW SCREEN (Used for window.print() sharing) -->
+        <section id="print-view" class="print-container hidden-screen">
+            <!-- Will be dynamically written when export is requested and window.print() is called -->
+        </section>
+        
+        <!-- MODALS / DIALOGS (SHARED DYNAMIC OVERLAY) -->
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="modal-title">Modal Title</h3>
+                    <button id="btn-modal-close" class="btn-icon-small">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </div>
+                <div id="modal-body" class="modal-body">
+                    <!-- Dynamic form will go here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDK compat libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/session-manager.js"></script>
+    <script src="js/data-repository.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/screens/login.js"></script>
+    <script src="js/screens/dashboard.js"></script>
+    <script src="js/screens/farmers.js"></script>
+    <script src="js/screens/shops.js"></script>
+    <script src="js/screens/purchases.js"></script>
+    <script src="js/screens/sales.js"></script>
+    <script src="js/screens/expenses.js"></script>
+    <script src="js/screens/payments.js"></script>
+    <script src="js/screens/vehicles.js"></script>
+    <script src="js/screens/staff.js"></script>
+    <script src="js/screens/reports.js"></script>
+</body>
+</html>

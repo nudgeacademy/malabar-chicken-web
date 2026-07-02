@@ -1,0 +1,190 @@
+/* CSS Variables - Color System & Tokens matching Jetpack Compose Color.kt */
+:root {
+    --green-primary: #044014;
+    --green-dark: #003822;
+    --mint-secondary: #2EC4B6;
+    --mint-light: #E6F5F0;
+    --gold-accent: #FFB703;
+    
+    --income-green: #2E7D32;
+    --expense-red: #C62828;
+    --owed-orange: #E65100;
+    
+    --bg-light: #FAFDFA;
+    --surface-light: #FFFFFF;
+    --surface-variant-light: #EDF2EE;
+    --on-surface-light: #1E2622;
+    --outline-light: #C2CBC5;
+    
+    --bg-dark: #0B0F0D;
+    --surface-dark: #151C18;
+    --surface-variant-dark: #222B26;
+    --on-surface-dark: #E1E5E2;
+    --outline-dark: #8B938E;
+    
+    /* Default light mode */
+    --background: var(--bg-light);
+    --surface: var(--surface-light);
+    --surface-variant: var(--surface-variant-light);
+    --on-surface: var(--on-surface-light);
+    --outline: var(--outline-light);
+    --primary: var(--green-primary);
+    --primary-container: var(--mint-light);
+    --on-primary: #FFFFFF;
+    --on-primary-container: var(--green-dark);
+    --secondary: var(--mint-secondary);
+    
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-circle: 50%;
+    
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Preference Override */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: var(--bg-dark);
+        --surface: var(--surface-dark);
+        --surface-variant: var(--surface-variant-dark);
+        --on-surface: var(--on-surface-dark);
+        --outline: var(--outline-dark);
+        
+        --primary: #6AE2A5;
+        --on-primary: #003822;
+        --primary-container: #005C38;
+        --on-primary-container: #E6F5F0;
+        --secondary: #72DDD2;
+    }
+}
+
+/* Base resetting & core layout settings */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--on-surface);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#app-container {
+    width: 100%;
+    max-width: 480px; /* Force premium mobile phone layout bounds on desktop */
+    height: 100vh;
+    position: relative;
+    background-color: var(--background);
+    box-shadow: 0 0 40px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+@media (min-width: 481px) {
+    body {
+        background: linear-gradient(135deg, var(--green-dark) 0%, #000000 100%);
+    }
+    #app-container {
+        height: 92vh;
+        border-radius: var(--radius-xl);
+        border: 4px solid var(--surface-variant);
+    }
+}
+
+/* Screen views wrapper */
+.screen-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background);
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(15px);
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
+}
+
+.screen-view.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    z-index: 20;
+}
+
+.screen-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scrollbar-width: none; /* Hide scrollbars */
+}
+
+.screen-content::-webkit-scrollbar {
+    display: none;
+}
+
+.screen-content.scrollable {
+    overflow-y: auto;
+}
+
+/* Utility Helpers */
+.hidden {
+    display: none !important;
+}
+
+.hidden-screen {
+    display: none !important;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(0,0,0,0.1);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.spinner-white {
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top: 3px solid #ffffff;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn var(--transition-fast) forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
