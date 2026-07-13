@@ -120,7 +120,7 @@ function openExpenseForm(expense = null) {
     
     title.textContent = expense ? "Edit Expense Log" : "Log Daily Expense";
     
-    const types = ["Transport", "Wages", "Fuel", "Feed", "Rent", "Other"];
+    const types = ["Transport", "Wages / Labor", "Vehicle Fuel", "Vehicle EMI", "Feed & Supplies", "Rent", "Other"];
     let typeOptions = ``;
     types.forEach(t => {
         typeOptions += `<option value="${t}" ${expense && expense.type === t ? 'selected' : ''}>${t}</option>`;

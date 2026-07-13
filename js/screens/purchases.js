@@ -78,12 +78,12 @@ function renderPurchasesList() {
                 <div style="height: 1px; background-color: var(--surface-variant); margin: 8px 0;"></div>
                 <div style="display:flex; justify-content:space-between; font-size:13px; line-height:20px;">
                     <div>
-                        <div>Total Wt: ${purchase.totalWeight} kg</div>
-                        <div>Empty Wt: ${purchase.emptyBoxWeight} kg</div>
-                        <div style="font-weight:700;">Net Wt: ${purchase.netWeight} kg</div>
+                        <div>Total Wt: ${(purchase.totalWeight || 0).toFixed(2)} kg</div>
+                        <div>Empty Wt: ${(purchase.emptyBoxWeight || 0).toFixed(2)} kg</div>
+                        <div style="font-weight:700;">Net Wt: ${(purchase.netWeight || 0).toFixed(2)} kg</div>
                     </div>
                     <div style="text-align:right;">
-                        <div>Rate: ₹${purchase.rate}/kg</div>
+                        <div>Rate: ₹${(purchase.rate || 0).toFixed(2)}/kg</div>
                         <div style="font-weight:700;">Total: ₹${(purchase.totalAmount || 0).toFixed(2)}</div>
                         <div style="color: ${purchase.paidAmount > 0 ? 'var(--income-green)' : '#888'}; font-weight: 600;">
                             Paid: ₹${(purchase.paidAmount || 0).toFixed(2)} (${purchase.paymentMode})
@@ -359,20 +359,20 @@ function generatePurchaseInvoicePrintView(purchase) {
                 <tbody>
                     <tr>
                         <td>Gross Weight</td>
-                        <td class="align-right">${purchase.totalWeight} kg</td>
+                        <td class="align-right">${(purchase.totalWeight || 0).toFixed(2)} kg</td>
                         <td class="align-right">-</td>
                         <td class="align-right">-</td>
                     </tr>
                     <tr>
                         <td>Empty Box Weight</td>
-                        <td class="align-right">- ${purchase.emptyBoxWeight} kg</td>
+                        <td class="align-right">- ${(purchase.emptyBoxWeight || 0).toFixed(2)} kg</td>
                         <td class="align-right">-</td>
                         <td class="align-right">-</td>
                     </tr>
                     <tr class="pdf-totals-row">
                         <td>Net Chicken Weight</td>
-                        <td class="align-right">${purchase.netWeight} kg</td>
-                        <td class="align-right">₹${purchase.rate}/kg</td>
+                        <td class="align-right">${(purchase.netWeight || 0).toFixed(2)} kg</td>
+                        <td class="align-right">₹${(purchase.rate || 0).toFixed(2)}/kg</td>
                         <td class="align-right">₹${purchase.totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                     </tr>
                 </tbody>

@@ -74,10 +74,10 @@ function openVehicleForm(vehicle = null) {
                 </div>
             </div>
             <div class="input-group">
-                <label for="form-vehicle-name">Driver / Vehicle Name *</label>
+                <label for="form-vehicle-name">Driver / Vehicle Name</label>
                 <div class="input-wrapper">
                     <span class="material-icons-round input-icon">person</span>
-                    <input type="text" id="form-vehicle-name" placeholder="Driver Name" required value="${vehicle ? vehicle.name : ''}">
+                    <input type="text" id="form-vehicle-name" placeholder="Driver Name" value="${vehicle ? vehicle.name : ''}">
                 </div>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Save Vehicle</button>

@@ -34,7 +34,7 @@ const DataRepository = {
             .onSnapshot(snapshot => {
                 const list = [];
                 snapshot.forEach(doc => {
-                    list.push({ id: doc.id, ...doc.data() });
+                    list.push({ ...doc.data(), id: doc.id });
                 });
                 this[cacheKey] = list;
                 this.trigger(cacheKey, list);
@@ -95,6 +95,17 @@ const DataRepository = {
 
     async deleteShop(id) {
         return db.collection("shops").doc(id).delete();
+    },
+
+    async getShopById(id) {
+        try {
+            const doc = await db.collection("shops").doc(id).get();
+            if (!doc.exists) return null;
+            return { ...doc.data(), id: doc.id };
+        } catch (e) {
+            console.warn("getShopById failed", e);
+            return null;
+        }
     },
 
     async updateShop(shopId, name, phone, address, newOpeningBalance) {
@@ -420,6 +431,6 @@ const DataRepository = {
         const snapshot = await db.collection("staff_users").where("username", "==", username).get();
         if (snapshot.empty) return null;
         const doc = snapshot.docs[0];
-        return { id: doc.id, ...doc.data() };
+        return { ...doc.data(), id: doc.id };
     }
 };

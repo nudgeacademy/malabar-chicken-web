@@ -269,94 +269,121 @@ function openExportLedgerDialog(party, partyType) {
 function generateLedgerPrintView(party, partyType, startDate, endDate) {
     const printViewEl = document.getElementById('print-view');
     printViewEl.innerHTML = '';
-    
-    // 1. Gather transactions
+
+    // 1. Gather transactions (discrete Type/Weight/Rate columns, matches PdfHelper.kt's CombinedLedgerEntry)
     let txs = [];
     if (partyType === "Farmer") {
         const purchases = DataRepository.getPurchasesForFarmer(party.id);
         const payments = DataRepository.getPaymentTransactionsForParty(party.id);
-        
+
         purchases.forEach(p => {
+            const modeStr = (p.paymentMode && p.paymentMode !== 'Credit') ? ` (${p.paymentMode})` : '';
             txs.push({
                 date: p.date,
-                type: "Purchase",
-                desc: `Vehicle: ${p.vehicleNo || 'N/A'} | Wt: ${p.netWeight} kg @ ₹${p.rate}`,
-                amount: p.totalAmount,
-                paid: p.paidAmount,
+                type: `Purchase${modeStr}`,
+                weight: p.netWeight || 0,
+                weightStr: `${(p.netWeight || 0).toFixed(2)} kg`,
+                rateStr: `₹${(p.rate || 0).toFixed(2)}`,
+                amount: p.totalAmount || 0,
+                paid: p.paidAmount || 0,
+                discount: 0,
+                isCredit: true, // increases balance (we owe farmer more)
                 dateObj: new Date(p.date + 'T00:00:00')
             });
         });
-        
+
         payments.forEach(pay => {
-            const discStr = pay.discount ? ` [+₹${pay.discount} Disc]` : '';
+            const modeStr = pay.paymentMode ? ` (${pay.paymentMode})` : '';
+            const discStr = pay.discount ? ` [+₹${pay.discount.toFixed(2)} Disc]` : '';
             txs.push({
                 date: pay.date,
-                type: pay.type, // Pay, Receive
-                desc: `Payment (${pay.paymentMode || 'Cash'})${discStr} ${pay.note ? '- ' + pay.note : ''}`,
-                amount: 0,
-                paid: (pay.amount || 0) + (pay.discount || 0),
+                type: `${pay.type === 'Pay' ? 'Paid' : pay.type}${modeStr}${discStr}`,
+                weight: 0,
+                weightStr: '-',
+                rateStr: '-',
+                amount: pay.amount || 0,
+                paid: 0,
+                discount: pay.discount || 0,
+                isCredit: false, // decreases balance
                 dateObj: new Date(pay.date + 'T00:00:00')
             });
         });
     } else {
         const sales = DataRepository.getSalesForShop(party.id);
         const payments = DataRepository.getPaymentTransactionsForParty(party.id);
-        
+
         sales.forEach(s => {
+            const modeStr = (s.paymentMode && s.paymentMode !== 'Credit') ? ` (${s.paymentMode})` : '';
             txs.push({
                 date: s.date,
-                type: "Sale",
-                desc: `Vehicle: ${s.vehicleNo || 'N/A'} | Wt: ${s.netWeight} kg @ ₹${s.rate}`,
-                amount: s.totalAmount,
-                paid: s.paidAmount,
+                type: `Sale${modeStr}`,
+                weight: s.netWeight || 0,
+                weightStr: `${(s.netWeight || 0).toFixed(2)} kg`,
+                rateStr: `₹${(s.rate || 0).toFixed(2)}`,
+                amount: s.totalAmount || 0,
+                paid: s.paidAmount || 0,
+                discount: 0,
+                isCredit: true, // increases balance (shop owes us more)
                 dateObj: new Date(s.date + 'T00:00:00')
             });
         });
-        
+
         payments.forEach(pay => {
-            const discStr = pay.discount ? ` [+₹${pay.discount} Disc]` : '';
+            const modeStr = pay.paymentMode ? ` (${pay.paymentMode})` : '';
+            const discStr = pay.discount ? ` [+₹${pay.discount.toFixed(2)} Disc]` : '';
             txs.push({
                 date: pay.date,
-                type: pay.type, // Receive, Pay
-                desc: `Receipt (${pay.paymentMode || 'Cash'})${discStr} ${pay.note ? '- ' + pay.note : ''}`,
-                amount: 0,
-                paid: (pay.amount || 0) + (pay.discount || 0),
+                type: `${pay.type === 'Receive' ? 'Received' : pay.type}${modeStr}${discStr}`,
+                weight: 0,
+                weightStr: '-',
+                rateStr: '-',
+                amount: pay.amount || 0,
+                paid: 0,
+                discount: pay.discount || 0,
+                isCredit: false, // decreases balance
                 dateObj: new Date(pay.date + 'T00:00:00')
             });
         });
     }
-    
+
     // Sort transactions ascending for ledger format
     txs.sort((a,b) => a.dateObj - b.dateObj);
-    
+
     // Filter by date range if applicable
     let filteredTxs = txs;
     let oldBalance = party.openingBalance || 0;
-    
+
     if (startDate || endDate) {
         filteredTxs = txs.filter(t => {
             if (startDate && t.dateObj < startDate) {
                 // Calculate old cumulative balance before date range
-                if (partyType === "Farmer") {
-                    oldBalance += (t.amount - t.paid);
-                } else {
-                    oldBalance += (t.amount - t.paid);
-                }
+                oldBalance += t.isCredit ? (t.amount - t.paid) : -(t.amount + t.discount);
                 return false;
             }
             if (endDate && t.dateObj > endDate) return false;
             return true;
         });
     }
-    
+
     const genDate = new Date();
     const formattedGenDate = `${String(genDate.getDate()).padStart(2, '0')}/${String(genDate.getMonth() + 1).padStart(2, '0')}/${genDate.getFullYear()} ${String(genDate.getHours()).padStart(2, '0')}:${String(genDate.getMinutes()).padStart(2, '0')}:${String(genDate.getSeconds()).padStart(2, '0')}`;
-    
+
     let periodStr = "All Time";
     if (startDate && endDate) periodStr = `${formatDisplayDate(getLocalISODate(startDate))} to ${formatDisplayDate(getLocalISODate(endDate))}`;
     else if (startDate) periodStr = `From ${formatDisplayDate(getLocalISODate(startDate))}`;
     else if (endDate) periodStr = `Until ${formatDisplayDate(getLocalISODate(endDate))}`;
-    
+
+    // Totals over the filtered (displayed) period — matches PdfHelper.kt's totalWt/totalAmt/cashPaid
+    let totalWt = 0, totalAmt = 0, cashPaid = 0;
+    filteredTxs.forEach(t => {
+        if (t.isCredit) {
+            totalWt += t.weight;
+            totalAmt += t.amount;
+        } else {
+            cashPaid += (t.amount + t.discount);
+        }
+    });
+
     let runningBalance = oldBalance;
     let tableRows = `
         <tr>
@@ -364,24 +391,40 @@ function generateLedgerPrintView(party, partyType, startDate, endDate) {
             <td><strong>Opening Balance</strong></td>
             <td class="align-right">-</td>
             <td class="align-right">-</td>
+            <td class="align-right">-</td>
             <td class="align-right"><strong>₹${oldBalance.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></td>
         </tr>
     `;
-    
+
     filteredTxs.forEach(t => {
-        runningBalance += (t.amount - t.paid);
-        
+        runningBalance += t.isCredit ? (t.amount - t.paid) : -(t.amount + t.discount);
+        const amtColor = t.isCredit ? '#C62828' : '#2E7D32';
+        const sign = t.isCredit ? '+' : '-';
+
         tableRows += `
             <tr>
                 <td>${formatDisplayDate(t.date)}</td>
-                <td>${t.desc}</td>
-                <td class="align-right">${t.amount > 0 ? '₹' + t.amount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
-                <td class="align-right">${t.paid > 0 ? '₹' + t.paid.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
+                <td>${t.type}</td>
+                <td class="align-right">${t.weightStr}</td>
+                <td class="align-right">${t.rateStr}</td>
+                <td class="align-right" style="color:${amtColor};">${sign}₹${t.amount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                 <td class="align-right"><strong>₹${runningBalance.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></td>
             </tr>
         `;
     });
-    
+
+    // TOTALS row (matches PdfHelper.kt's final closing-balance row)
+    tableRows += `
+        <tr class="pdf-totals-row">
+            <td>TOTALS</td>
+            <td></td>
+            <td class="align-right">${totalWt.toFixed(2)} kg</td>
+            <td></td>
+            <td class="align-right">Net: ₹${(totalAmt - cashPaid).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="align-right" style="color:${runningBalance > 0 ? '#C62828' : '#2E7D32'};"><strong>₹${runningBalance.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></td>
+        </tr>
+    `;
+
     printViewEl.innerHTML = `
         <div class="print-container">
             <div class="pdf-header">
@@ -411,22 +454,23 @@ function generateLedgerPrintView(party, partyType, startDate, endDate) {
                 <div class="pdf-card" style="flex:1;">
                     <div class="pdf-card-header">Account Balance</div>
                     <div class="pdf-card-body" style="text-align: right;">
-                        <span style="font-size:10px; color:#777; text-transform:uppercase;">Current Outstanding Balance</span><br>
-                        <strong style="font-size: 20px; color: ${party.balance > 0 ? (partyType === 'Farmer' ? '#C62828' : '#2E7D32') : (partyType === 'Farmer' ? '#2E7D32' : '#C62828')};">
-                            ₹${Math.abs(party.balance).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                        <span style="font-size:10px; color:#777; text-transform:uppercase;">Outstanding Balance (as of ${periodStr})</span><br>
+                        <strong style="font-size: 20px; color: ${runningBalance > 0 ? (partyType === 'Farmer' ? '#C62828' : '#2E7D32') : (partyType === 'Farmer' ? '#2E7D32' : '#C62828')};">
+                            ₹${Math.abs(runningBalance).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </strong><br>
-                        <span style="font-size:11px; color:#111;">${party.balance > 0 ? (partyType === 'Farmer' ? 'We Owe' : 'Owes Us') : (partyType === 'Farmer' ? 'Advance Paid' : 'Advance Received')}</span>
+                        <span style="font-size:11px; color:#111;">${runningBalance > 0 ? (partyType === 'Farmer' ? 'We Owe' : 'Owes Us') : (partyType === 'Farmer' ? 'Advance Paid' : 'Advance Received')}</span>
                     </div>
                 </div>
             </div>
-            
+
             <table class="pdf-table">
                 <thead>
                     <tr>
                         <th>Date</th>
-                        <th>Description</th>
-                        <th class="align-right">Charges (+)</th>
-                        <th class="align-right">Payments (-)</th>
+                        <th>Type</th>
+                        <th class="align-right">Weight</th>
+                        <th class="align-right">Rate</th>
+                        <th class="align-right">Amount</th>
                         <th class="align-right">Balance</th>
                     </tr>
                 </thead>

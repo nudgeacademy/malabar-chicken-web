@@ -78,12 +78,12 @@ function renderSalesList() {
                 <div style="height: 1px; background-color: var(--surface-variant); margin: 8px 0;"></div>
                 <div style="display:flex; justify-content:space-between; font-size:13px; line-height:20px;">
                     <div>
-                        <div>Total Wt: ${sale.totalWeight} kg</div>
-                        <div>Empty Wt: ${sale.emptyBoxWeight} kg</div>
-                        <div style="font-weight:700;">Net Wt: ${sale.netWeight} kg</div>
+                        <div>Total Wt: ${(sale.totalWeight || 0).toFixed(2)} kg</div>
+                        <div>Empty Wt: ${(sale.emptyBoxWeight || 0).toFixed(2)} kg</div>
+                        <div style="font-weight:700;">Net Wt: ${(sale.netWeight || 0).toFixed(2)} kg</div>
                     </div>
                     <div style="text-align:right;">
-                        <div>Rate: ₹${sale.rate}/kg</div>
+                        <div>Rate: ₹${(sale.rate || 0).toFixed(2)}/kg</div>
                         <div style="font-weight:700;">Total: ₹${(sale.totalAmount || 0).toFixed(2)}</div>
                         <div style="color: ${sale.paidAmount > 0 ? 'var(--income-green)' : '#888'}; font-weight: 600;">
                             Paid: ₹${(sale.paidAmount || 0).toFixed(2)} (${sale.paymentMode})
@@ -376,7 +376,23 @@ function generateSaleInvoicePrintView(sale) {
             </tr>
         `;
     });
-    if (payments.length === 0) paymentsRows += `<tr><td colspan="4" style="text-align:center;">No payment transactions found</td></tr>`;
+    if (payments.length > 0) {
+        paymentsRows += `
+            <tr class="pdf-totals-row">
+                <td>TOTAL RECEIVED</td>
+                <td></td>
+                <td></td>
+                <td class="align-right">₹${cashPaid.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            </tr>
+        `;
+    } else {
+        paymentsRows += `<tr><td colspan="4" style="text-align:center;">No payment transactions found</td></tr>`;
+    }
+
+    const closingBalance = displayOldBalance + totalAmt - totalSalesPaidInline - cashPaid;
+    const closingLabel = closingBalance > 0 ? 'Current Outstanding:' : 'Advance We Owe:';
+    const closingAmtStr = `₹${Math.abs(closingBalance).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    const closingColor = closingBalance > 0 ? '#C62828' : '#2E7D32';
 
     printViewEl.innerHTML = `
         <div class="print-container">
@@ -442,7 +458,22 @@ function generateSaleInvoicePrintView(sale) {
                 </thead>
                 <tbody>${paymentsRows}</tbody>
             </table>
-            
+
+            <div style="margin: 20px 40px 0 auto; max-width: 320px; margin-left: auto;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; padding: 3px 0;">
+                    <span>Grand Total Amount:</span>
+                    <strong style="color:#C62828;">₹${totalAmt.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:11px; padding: 3px 0;">
+                    <span>Total Received Amount:</span>
+                    <strong style="color:#2E7D32;">₹${(totalSalesPaidInline + cashPaid).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; padding: 3px 0; font-weight:700;">
+                    <span style="color:${closingColor};">${closingLabel}</span>
+                    <strong style="color:${closingColor};">${closingAmtStr}</strong>
+                </div>
+            </div>
+
             <div class="pdf-footer">
                 <div>Generated on: ${formattedGenDate}</div>
                 <div>System Generated Electronic Report</div>

@@ -99,13 +99,13 @@ function updateDashboardData() {
     }
     
     // Render Stats
-    document.getElementById('stat-sales-amount').textContent = `₹${totalSales.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    document.getElementById('stat-sales-amount').textContent = `₹${totalSales.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     document.getElementById('stat-sales-count').textContent = `${filteredSales.length} bills`;
-    
-    document.getElementById('stat-purchases-amount').textContent = `₹${totalPurchases.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+
+    document.getElementById('stat-purchases-amount').textContent = `₹${totalPurchases.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     document.getElementById('stat-purchases-count').textContent = `${filteredPurchases.length} lots`;
-    
-    document.getElementById('stat-expenses-amount').textContent = `₹${totalExpenses.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+
+    document.getElementById('stat-expenses-amount').textContent = `₹${totalExpenses.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     document.getElementById('stat-expenses-count').textContent = `${filteredExpenses.length} items`;
     
     // 4. Render overall ledger balances

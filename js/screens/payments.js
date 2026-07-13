@@ -279,6 +279,12 @@ function openPaymentForm(tx = null) {
                 await DataRepository.updatePaymentTransaction(tx, newTx);
             } else {
                 await DataRepository.addPaymentTransaction(newTx);
+                const party = partyType === "Farmer"
+                    ? DataRepository.farmers.find(f => f.id === partyId)
+                    : DataRepository.shops.find(s => s.id === partyId);
+                if (party && party.phone && party.phone.trim()) {
+                    sharePaymentReceipt(newTx);
+                }
             }
             closeModal();
         } catch (err) {
