@@ -186,6 +186,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
 
 /* 3. HEADER / APP BAR */
 .app-bar {
