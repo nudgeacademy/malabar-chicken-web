@@ -91,10 +91,10 @@ function updateDashboardData() {
     pnlValEl.textContent = `${prefix}₹${netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     
     if (netProfit >= 0) {
-        heroCard.className = "pnl-hero card profit";
+        heroCard.className = "pnl-hero profit";
         pnlStatusEl.textContent = "Net Profit ↑";
     } else {
-        heroCard.className = "pnl-hero card loss";
+        heroCard.className = "pnl-hero loss";
         pnlStatusEl.textContent = "Net Loss ↓";
     }
     
@@ -139,7 +139,7 @@ function renderModulesGrid() {
         modules.push({ title: "Sales", subtitle: "Sell to shops", icon: "send", color: "#F3E5F5", iconColor: "#6A1B9A", screen: "sales-screen" });
     }
     if (SessionManager.canViewExpenses()) {
-        modules.push({ title: "Expenses", subtitle: "Daily operating costs", icon: "receipt", color: "#FFFFEBEE", iconColor: "#C62828", screen: "expenses-screen" });
+        modules.push({ title: "Expenses", subtitle: "Daily operating costs", icon: "receipt", color: "#FFEBEE", iconColor: "#C62828", screen: "expenses-screen" });
     }
     if (SessionManager.canViewPayments()) {
         modules.push({ title: "Payments", subtitle: "Receipts & payouts", icon: "account_balance_wallet", color: "#E0F7FA", iconColor: "#00838F", screen: "payments-screen" });

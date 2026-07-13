@@ -252,6 +252,11 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.btn-icon-small:hover {
+    background-color: var(--surface-variant);
 }
 
 /* 4. DATE SELECTOR */
@@ -274,10 +279,18 @@
     font-weight: 700;
     font-size: 14px;
     position: relative;
+    background-color: var(--surface);
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: var(--shadow-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.date-picker-trigger:hover {
+    background-color: var(--surface-variant);
 }
 
 .date-picker-trigger:active {
-    background-color: rgba(0,0,0,0.05);
+    background-color: var(--outline);
 }
 
 .hidden-date-input {
@@ -486,10 +499,12 @@
     border: 1px solid rgba(0,0,0,0.06);
     box-shadow: var(--shadow-sm);
     padding: 12px;
-    height: 96px;
+    min-height: 96px;
+    height: auto;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 8px;
     cursor: pointer;
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
