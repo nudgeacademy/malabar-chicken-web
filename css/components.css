@@ -186,31 +186,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.demo-info-card {
-    background-color: var(--surface-variant);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(0,0,0,0.04);
-    padding: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 24px;
-    width: 100%;
-}
-
-.demo-info-card p {
-    font-size: 11px;
-    line-height: 15px;
-    color: var(--on-surface);
-    opacity: 0.8;
-}
-
-.info-icon {
-    font-size: 20px;
-    color: var(--primary);
-}
 
 /* 3. HEADER / APP BAR */
 .app-bar {
